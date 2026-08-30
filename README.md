@@ -15,7 +15,11 @@ Aplicación web para reservar salas de reuniones, desarrollada como proyecto per
 
 ## Capturas
 
-<!-- Arrastra aquí las capturas (inicio, login, formulario de reserva, panel de admin...) al editar este README en GitHub -->
+<img width="1010" height="394" alt="6" src="https://github.com/user-attachments/assets/27d95e28-1623-48de-81da-2ce80d837494" />
+<img width="1146" height="888" alt="7" src="https://github.com/user-attachments/assets/677c9edc-5486-4601-906c-1683de87b56e" />
+<img width="1045" height="809" alt="4" src="https://github.com/user-attachments/assets/6e2b8ac2-d4a4-4981-9619-2e2f639280f4" />
+<img width="1057" height="456" alt="5" src="https://github.com/user-attachments/assets/063d3978-6fda-4bf9-bde5-5a022db86c21" />
+
 
 ## Cuentas de prueba
 
