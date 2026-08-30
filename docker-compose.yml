@@ -1,0 +1,14 @@
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: reservas_db
+    ports:
+      - "3310:3306"
+    volumes:
+      - portfolioapp_mysql_data:/var/lib/mysql
+
+volumes:
+  portfolioapp_mysql_data:
