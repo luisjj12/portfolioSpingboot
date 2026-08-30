@@ -2,6 +2,8 @@
 
 Aplicación web para reservar salas de reuniones, desarrollada como proyecto personal, con **Spring Boot** y Java en el backend y **React** en el frontend. Incluye dos tipos de usuario (usuario normal y administrador) y control de solapamiento de horarios para que no se pueda reservar una sala ya ocupada.
 
+Demo en producción: https://portfolio-spingboot.vercel.app/
+
 ## Índice
 
 - [Capturas](#capturas)
@@ -26,7 +28,7 @@ Mis reservas | Todas las reservas (admin)
 
 ## Cuentas de prueba
 
-El proyecto todavía no está desplegado en producción, así que no hay una demo en vivo con cuentas de prueba. Para probar el panel de administrador en local:
+La demo en producción parte de una base de datos vacía y no trae cuentas de prueba creadas. Puedes registrarte tú mismo desde la web (crea una cuenta de usuario normal). Para probar el panel de administrador, tanto en la demo como en local:
 
 1. Regístrate normalmente desde la web (esto crea una cuenta de tipo usuario normal).
 2. Conéctate a la base de datos y cambia tu rol a administrador:
