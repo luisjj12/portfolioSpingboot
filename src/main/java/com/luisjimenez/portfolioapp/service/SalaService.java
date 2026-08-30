@@ -2,6 +2,8 @@ package com.luisjimenez.portfolioapp.service;
 
 import com.luisjimenez.portfolioapp.entity.Sala;
 import com.luisjimenez.portfolioapp.exception.RecursoNoEncontradoException;
+import com.luisjimenez.portfolioapp.exception.SalaConReservasException;
+import com.luisjimenez.portfolioapp.repository.ReservaRepository;
 import com.luisjimenez.portfolioapp.repository.SalaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +17,11 @@ public class SalaService {
     private static final Logger logger = LoggerFactory.getLogger(SalaService.class);
 
     private final SalaRepository salaRepository;
+    private final ReservaRepository reservaRepository;
 
-    public SalaService(SalaRepository salaRepository) {
+    public SalaService(SalaRepository salaRepository, ReservaRepository reservaRepository) {
         this.salaRepository = salaRepository;
+        this.reservaRepository = reservaRepository;
     }
 
     public List<Sala> findAll() {
@@ -36,6 +40,9 @@ public class SalaService {
     }
 
     public void deleteById(Long id) {
+        if (reservaRepository.existsBySalaId(id)) {
+            throw new SalaConReservasException("No se puede eliminar la sala porque tiene reservas asociadas");
+        }
         salaRepository.deleteById(id);
         logger.info("Sala eliminada, id {}", id);
     }
