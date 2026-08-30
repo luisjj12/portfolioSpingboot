@@ -55,7 +55,7 @@ export function Register() {
           <input
             type="password"
             required
-            minLength={4}
+            minLength={8}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="input"
