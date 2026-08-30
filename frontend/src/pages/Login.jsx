@@ -16,8 +16,9 @@ export function Login() {
     setError('')
     setLoading(true)
     try {
-      await login(email, password)
-      navigate(location.state?.from ?? '/')
+      const data = await login(email, password)
+      const destino = data.role === 'ADMIN' ? '/admin/salas' : '/'
+      navigate(location.state?.from ?? destino)
     } catch (err) {
       setError(
         err.message?.startsWith('No se pudo conectar')

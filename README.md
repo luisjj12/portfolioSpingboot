@@ -14,6 +14,37 @@ Backend en **Spring Boot** (API REST + autenticación JWT) y frontend en **React
 - Panel de administración: alta/edición/borrado de salas y cancelación de cualquier reserva del sistema.
 - Rutas protegidas en el frontend según autenticación y rol.
 
+## Cómo funciona
+
+### Arquitectura general
+
+El frontend (React) y el backend (Spring Boot) son dos aplicaciones independientes que se comunican por HTTP con JSON. El backend no sirve HTML ni mantiene sesión: cada petición del navegador debe llevar su propio token de autenticación, y el servidor no guarda estado entre peticiones (`SessionCreationPolicy.STATELESS`). Esto es lo que permite escalar el backend horizontalmente sin preocuparse por sesiones compartidas.
+
+```
+Navegador ⇄ React (Vite, :5173) ⇄ fetch JSON ⇄ Spring Boot (:8080) ⇄ MySQL (:3310)
+```
+
+### Flujo de autenticación (JWT)
+
+1. El usuario se registra (`POST /api/auth/register`) o inicia sesión (`POST /api/auth/login`).
+2. `AuthController` delega en `UsuarioService` (verifica credenciales con `AuthenticationManager` + `PasswordEncoder`) y, si son válidas, `JwtService` genera un token firmado (HMAC) que incluye el email, el id y el rol del usuario, con expiración de 24h.
+3. El frontend guarda ese token en `localStorage` a través de `AuthContext` y lo adjunta como cabecera `Authorization: Bearer <token>` en cada petición protegida (`src/api/client.js`).
+4. En el backend, `JwtAuthFilter` intercepta cada petición entrante, valida el token y, si es correcto, reconstruye la identidad del usuario en el `SecurityContext` para que Spring Security sepa quién hace la petición y con qué rol — sin tocar la base de datos de sesiones, porque no existe: todo vive en el propio token.
+5. `SecurityConfig` decide, por rol y método HTTP, qué endpoints son públicos (`GET /api/salas`), cuáles requieren estar autenticado (`/api/reservas/**`) y cuáles requieren rol `ADMIN` (crear/editar/borrar salas).
+
+### Flujo de una reserva
+
+1. El usuario elige una sala en la vista `Salas`, indica fecha, hora de inicio y hora de fin, y envía el formulario (`POST /api/reservas?salaId=...`).
+2. `ReservaService.crear()` primero busca todas las reservas existentes para esa sala en esa fecha, y comprueba si el nuevo rango de horas se solapa con alguna de ellas (`horaInicioExistente < horaFinNueva && horaInicioNueva < horaFinExistente`). Si hay solapamiento, lanza `ReservaSolapadaException` y el backend responde `409 Conflict` con un mensaje claro.
+3. Si no hay conflicto, la reserva se guarda asociada a la sala y al usuario autenticado (extraído del token, nunca del cuerpo de la petición, para que un usuario no pueda reservar en nombre de otro).
+4. El usuario puede ver sus reservas en "Mis reservas" y cancelarlas; `ReservaService.cancelar()` comprueba que la reserva pertenezca a quien la cancela (o que sea un `ADMIN`, que puede cancelar cualquiera) antes de borrarla.
+
+### Capas de protección
+
+Los permisos se aplican en dos sitios distintos, con propósitos distintos:
+- **Frontend (`ProtectedRoute.jsx`)**: solo mejora la experiencia — oculta enlaces y redirige a `/login` si no hay sesión. No es seguridad real, porque cualquiera puede saltarse el frontend y llamar a la API directamente.
+- **Backend (`SecurityConfig` + `JwtAuthFilter`)**: aquí es donde se aplican los permisos de verdad. Cada endpoint decide, según el rol del token, si la petición se procesa o se rechaza con `401`/`403`, independientemente de lo que haga el frontend.
+
 ## Stack técnico
 
 **Backend**
