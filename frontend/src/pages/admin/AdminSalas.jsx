@@ -45,8 +45,8 @@ export function AdminSalas() {
       }
       cancelarEdicion()
       cargar()
-    } catch {
-      setError('No se pudo guardar la sala')
+    } catch (err) {
+      setError(err.message || 'No se pudo guardar la sala')
     }
   }
 
@@ -55,8 +55,8 @@ export function AdminSalas() {
     try {
       await api.deleteSala(id, token)
       setSalas((prev) => prev.filter((s) => s.id !== id))
-    } catch {
-      alert('No se pudo eliminar la sala')
+    } catch (err) {
+      alert(err.message || 'No se pudo eliminar la sala')
     }
   }
 

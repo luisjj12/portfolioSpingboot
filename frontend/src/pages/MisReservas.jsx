@@ -24,8 +24,8 @@ export function MisReservas() {
     try {
       await api.cancelarReserva(id, token)
       setReservas((prev) => prev.filter((r) => r.id !== id))
-    } catch {
-      alert('No se pudo cancelar la reserva')
+    } catch (err) {
+      alert(err.message || 'No se pudo cancelar la reserva')
     }
   }
 
