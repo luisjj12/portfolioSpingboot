@@ -17,8 +17,22 @@ async function request(path, { method = 'GET', body, token } = {}) {
   }
 
   if (!res.ok) {
-    const text = await res.text().catch(() => '')
-    throw new Error(text || `Error ${res.status}`)
+    const contentType = res.headers.get('content-type') ?? ''
+    let message = `Error ${res.status}`
+
+    if (contentType.includes('application/json')) {
+      const data = await res.json().catch(() => null)
+      if (data && typeof data === 'object') {
+        message = Object.values(data).join(' ')
+      } else if (typeof data === 'string' && data) {
+        message = data
+      }
+    } else {
+      const text = await res.text().catch(() => '')
+      if (text) message = text
+    }
+
+    throw new Error(message)
   }
 
   if (res.status === 204) return null
